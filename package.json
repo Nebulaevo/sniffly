@@ -7,7 +7,7 @@
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
     "description": "A lightweight TypeScript utility library for performing common type-safe value checks with type narrowing",
-    "keywords": ["validation", "value-validation", "type-guards", "type-checking", "sniffly"],
+    "keywords": ["validation", "value-validation", "type-guards", "type-checking", "dependency-free", "sniffly"],
     "repository": {
         "type": "git",
         "url": "https://github.com/Nebulaevo/sniffly.git"
