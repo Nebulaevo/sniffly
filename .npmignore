@@ -1,0 +1,5 @@
+src/
+test/
+.vitest/
+node_modules/
+tsconfig.json
