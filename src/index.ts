@@ -6,8 +6,8 @@ type objWithLength_T = {
 
 type numberCheckerOptions_T = {
     positive?: boolean,
-    max?: number,
     min?: number,
+    max?: number,
 }
 
 type stringCheckingOptions_T = {
@@ -27,19 +27,18 @@ type ItemTypeMap_T = {
     dict: Dict_T<unknown>
 }
 
-type arrayCheckingOptions_T<T extends keyof ItemTypeMap_T> = {
+type arrayCheckingOptions_T<ItemTypeName extends keyof ItemTypeMap_T> = {
     nonEmpty?: boolean,
-    itemType?: T
+    itemType?: ItemTypeName
 }
 
-type dictCheckingOptions_T<K extends string, T extends keyof ItemTypeMap_T> = {
+type dictCheckingOptions_T<ObjKeys extends string, ItemTypeName extends keyof ItemTypeMap_T> = {
     nonEmpty?: boolean,
-    itemType?: T,
-    keys?: K[]
+    itemType?: ItemTypeName,
+    keys?: ObjKeys[]
 }
 
-/**
- * checks that an iterable is not empty
+/** Checks that an iterable is not empty
  * 
  * @param value an object having a length attribute
  * @returns true if the object's length is more than zero
@@ -48,8 +47,7 @@ function iterHasItems( value: objWithLength_T ) {
     return value.length > 0
 }
 
-/**
- * checks that a dictionary is not empty
+/** Checks that a dictionary is not empty
  * 
  * @param value a key/value object (dict)
  * @returns true if the object's length is more than zero
@@ -58,8 +56,7 @@ function dictHasEntries( value: Dict_T<any> ) {
     return iterHasItems( Object.keys(value) )
 }
 
-/**
- * checks that the value is a boolean
+/** Checks that the value is a boolean
  * 
  * @returns true if the value is of type boolean
  */
@@ -67,8 +64,7 @@ function isBool( value:unknown ): value is boolean {
     return typeof value === 'boolean'
 }
 
-/**
- * checks that the value is a number satisfying optionnal specifications
+/** Checks that the value is a number satisfying optionnal specifications
  * (NaN is not considered as a number)
  * 
  * @param value unknown value to check
@@ -86,16 +82,15 @@ function isNumber( value:unknown, options?:numberCheckerOptions_T ): value is nu
     if (options) {
         const { positive, max, min } = options
 
-        if ( positive && value <= 0 ) return false
-        if ( typeof max === 'number' && value > max ) return false
-        if ( typeof min === 'number' && value < min ) return false
+        if ( positive && value <= 0 ) return false;
+        if ( isNumber(min) && value < min ) return false;
+        if ( isNumber(max) && value > max ) return false;
     }
     
     return true
 }
 
-/**
- * checks that the value is a string satisfying optionnal specifications
+/** Checks that the value is a string satisfying optionnal specifications
  * 
  * @param value unknown value to check
  * @param options (dict) optionnal additionnal specifications
@@ -109,15 +104,33 @@ function isString( value:unknown, options?:stringCheckingOptions_T ): value is s
     if (typeof value !== 'string' ) return false
 
     if ( options ) {
-        const { nonEmpty, regexPattern } = options 
-        if (nonEmpty && !iterHasItems(value)) return false
-        if (regexPattern && !value.match(regexPattern)) return false
+        const { nonEmpty, regexPattern } = options
+
+        if (nonEmpty && !iterHasItems(value)) return false;
+        if (regexPattern && !value.match(regexPattern)) return false;
     }
     return true
 }
 
-/**
- * checks that the value is an array satisfying optionnal specifications
+/** Private function checking that all items of an array are of a certain type
+ * 
+ * @param items list of item to check
+ * @param type (literal string: "any", "unknown", "string", "number", "boolean", "array", "dict") expected type of those items
+ */
+function _itemsAreOfType( items: unknown[], type: keyof ItemTypeMap_T ): boolean {
+    const nonCheckedTypes = ["any", "unknown"]
+    const primitiveTypes = [ "string", "number", "boolean" ]
+
+    if ( nonCheckedTypes.includes(type) ) return true;
+    else if ( primitiveTypes.includes(type) ) return items.every((item) => typeof item === type);
+    else if ( type === 'array' ) return items.every((item) => Array.isArray(item));
+    else if ( type === 'dict' ) return items.every((item) => isDict(item));
+    
+    return false
+}
+
+
+/** Checks that the value is an array satisfying optionnal specifications
  * 
  * @param value unknown value to check
  * @param options (dict) optionnal additionnal specifications
@@ -126,42 +139,24 @@ function isString( value:unknown, options?:stringCheckingOptions_T ): value is s
  * 
  * @returns boolean indicating if value satisfies requirements
  */
-function isArray<T extends keyof ItemTypeMap_T = "unknown">(
+function isArray<ItemTypeName extends keyof ItemTypeMap_T = "unknown">(
     value: unknown,
-    options?: arrayCheckingOptions_T<T>
-): value is Array<ItemTypeMap_T[T]> {
+    options?: arrayCheckingOptions_T<ItemTypeName>
+): value is Array<ItemTypeMap_T[ItemTypeName]> {
 
     if (!Array.isArray(value)) return false
     
     if ( options ) {
         const { nonEmpty, itemType } = options
 
-        if (nonEmpty && !iterHasItems(value)) return false
-
-        if (itemType) {
-            let itemsAreValid = false
-            const nonCheckedTypes = ["any", "unknown"]
-            const primitiveTypes = [ "string", "number", "boolean" ]
-
-            if ( nonCheckedTypes.includes(itemType) ) {
-                itemsAreValid = true
-            } else if ( primitiveTypes.includes(itemType) ) {
-                itemsAreValid = value.every((item) => typeof item === itemType)
-            } else if ( itemType === 'array' ) {
-                itemsAreValid = value.every((item) => Array.isArray(item))
-            } else if ( itemType === 'dict' ) {
-                itemsAreValid = value.every((item) => isDict(item))
-            }
-
-            if (!itemsAreValid) return false
-        }
+        if (nonEmpty && !iterHasItems(value)) return false;
+        if (itemType && !_itemsAreOfType(value, itemType)) return false;
     }
 
     return true
 }
 
-/**
- * checks that the value is a key/value pair dictionnary satisfying optionnal specifications
+/** Checks that the value is a key/value pair dictionnary satisfying optionnal specifications
  * 
  * @param value unknown value to check
  * @param options (dict) optionnal additionnal specifications
@@ -171,39 +166,21 @@ function isArray<T extends keyof ItemTypeMap_T = "unknown">(
  * 
  * @returns boolean indicating if value satisfies requirements
  */
-function isDict<K extends string, T extends keyof ItemTypeMap_T = "unknown">(
+function isDict<ObjKeys extends string, ItemTypeName extends keyof ItemTypeMap_T = "unknown">(
     value: unknown,
-    options?: dictCheckingOptions_T<K, T>
-): value is Record<K, ItemTypeMap_T[T]> {
+    options?: dictCheckingOptions_T<ObjKeys, ItemTypeName>
+): value is Record<ObjKeys, ItemTypeMap_T[ItemTypeName]> {
 
-    if (typeof value !== "object" || value === null || Array.isArray(value)) {
+    if (typeof value !== "object" || value === null || Object.getPrototypeOf(value) !== Object.prototype ) {
         return false
     }
     
     if (options) {
         const {nonEmpty, keys, itemType } = options
     
-        if ( nonEmpty && !dictHasEntries(value) ) return false
-        if ( keys && !keys.every((key) => key in value)) return false
-    
-        if (itemType) {
-            let itemsAreValid = false
-            const dictEntries = Object.values(value)
-            const nonCheckedTypes = ["any", "unknown"]
-            const primitiveTypes = [ "string", "number", "boolean" ]
-
-            if ( nonCheckedTypes.includes(itemType) ) {
-                itemsAreValid = true
-            } else if ( primitiveTypes.includes(itemType) ) {
-                itemsAreValid = dictEntries.every((entry) => typeof entry === itemType)
-            } else if ( itemType === 'array' ) {
-                itemsAreValid = dictEntries.every((entry) => Array.isArray(entry))
-            } else if ( itemType === 'dict' ) {
-                itemsAreValid = dictEntries.every((entry) => isDict(entry))
-            }
-
-            if (!itemsAreValid) return false
-        }
+        if ( nonEmpty && !dictHasEntries(value) ) return false;
+        if ( keys && !keys.every((key) => key in value)) return false;
+        if (itemType && !_itemsAreOfType(Object.values(value), itemType)) return false;
     }
 
     return true
