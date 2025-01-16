@@ -1,15 +1,22 @@
 {
     "name": "sniffly",
     "version": "1.0.0",
-    "description": "Utility functions permforming checks on values",
+    "author": "Nebulaevo",
+    "license": "MIT",
+    "type": "module",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
+    "description": "A lightweight TypeScript utility library for performing common type-safe value checks with type narrowing",
+    "keywords": ["validation", "value-validation", "type-guards", "type-checking", "sniffly"],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/Nebulaevo/sniffly.git"
+    },
     "scripts": {
         "test": "vitest",
-        "build": "tsc --build --clean && tsc"
+        "build": "tsc --build --clean && tsc",
+        "prepare": "npm run build"
     },
-    "author": "Didier Martin",
-    "license": "MIT",
     "devDependencies": {
         "@types/node": "^22.10.5",
         "typescript": "^5.7.3",
