@@ -1,7 +1,13 @@
 # 👀 Sniffly
 **Value Checking Utilities for JavaScript**
 
-Provides a few functions (with type narrowing) performing common simple checks on JS values.
+A lightweight TypeScript utility library for performing common type-safe value checks with type narrowing.
+
+## Install
+
+```
+npm i sniffly
+```
 
 
 ## Functions
