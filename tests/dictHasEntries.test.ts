@@ -2,11 +2,11 @@ import { dictHasEntries } from '../dist/index'
 import { describe, expect, it } from 'vitest'
 
 describe("#dictHasEntries", () => {
-    it( "return true for non empty", () => {
+    it( "identifies a non empty key/value object", () => {
+        // valid
         expect( dictHasEntries({'a': 1}) ).toBe(true)
-    })
-    
-    it( "return false for empty", () => {
+        
+        // invalid
         expect( dictHasEntries({}) ).toBe(false)
     })
 })
