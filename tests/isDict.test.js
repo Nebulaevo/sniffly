@@ -5,8 +5,9 @@ describe("#isDict", () => {
 
     it( "return true if restrictions are respected", () => {
 
-        // array
+        // key/value dicts
         expect( isDict({}) ).toBe(true)
+        expect( isDict(Object.create(Object.prototype)) ).toBe(true)
         expect( isDict({a:1, b:2}) ).toBe(true)
 
         // non empty
@@ -38,7 +39,7 @@ describe("#isDict", () => {
     })
 
     it( "return false if restrictions are not respected", () => {
-        // not an array
+        // not a key/value dicts
         expect( isDict('') ).toBe(false)
         expect( isDict(0) ).toBe(false)
         expect( isDict(1.1) ).toBe(false)
@@ -46,6 +47,15 @@ describe("#isDict", () => {
         expect( isDict(undefined) ).toBe(false)
         expect( isDict(true) ).toBe(false)
         expect( isDict([]) ).toBe(false)   
+
+        // objects created with no prototypes are a special case
+        // for sanity reasons we will just consider they are invalid
+        expect( isDict(Object.create(null)) ).toBe(false)
+
+        // objects built with classes should be ignored
+        expect( isDict( new Map() ) ).toBe(false)
+        expect( isDict( new Set() ) ).toBe(false)
+        expect( isDict( new (class Foo{}) ) ).toBe(false)
 
         // doesn't respect restriction
         expect( isDict({}, {nonEmpty:true}) ).toBe(false)

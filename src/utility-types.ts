@@ -1,8 +1,6 @@
 
-/* dict with string keys 
-<T> - type of values */
-type Dict_T<T> = { [key:string]: T }
-/* ex: const colors: Dict_T<string> */
+/** Utility type representing key/value pair dictionnary with string keys */
+type Dict_T<EntriesType> = { [key:string]: EntriesType }
 
 export type {
     Dict_T

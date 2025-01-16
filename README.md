@@ -9,29 +9,38 @@ Provides a few functions (with type narrowing) performing common simple checks o
 
 ### `iterHasItems( value )`
 
-checks that an iterable is not empty
+Checks that an iterable is not empty
+
+#### ⚙️ Arguments:
 
 **value** - object having a length attribute
 
 
 ### `dictHasEntries( value )`
 
-checks that a dictionary is not empty
+Checks that a dictionary is not empty
 
-**value** - key/value object (dict)
+#### ⚙️ Arguments:
+
+**value** - key/value pair dictionnary
 
 
 ### `isBool( value )`
 
-checks that the value is a boolean
+Checks that the value is a boolean
+
+#### ⚙️ Arguments:
 
 **value** - unknown value to check
 
 
 ### `isNumber( value, options? )`
 
-checks that the value is a number satisfying optionnal specifications\
-(`NaN` is not considered as a valid number)
+Checks that the value is a number satisfying optionnal specifications\
+**Remark:**\
+`NaN` is not considered as a valid number
+
+#### ⚙️ Arguments:
 
 **value** - unknown value to check\
 **options** *(dict)* - optionnal additionnal specifications\
@@ -42,7 +51,9 @@ checks that the value is a number satisfying optionnal specifications\
 
 ### `isString( value, options? )`
 
-checks that the value is a string satisfying optionnal specifications
+Checks that the value is a string satisfying optionnal specifications
+
+#### ⚙️ Arguments:
 
 **value** - unknown value to check\
 **options** *(dict)* - optionnal additionnal specifications\
@@ -52,7 +63,9 @@ checks that the value is a string satisfying optionnal specifications
 
 ### `isArray( value, options? )`
 
-checks that the value is an array satisfying optionnal specifications
+Checks that the value is an array satisfying optionnal specifications
+
+#### ⚙️ Arguments:
 
 **value** - unknown value to check\
 **options** *(dict)* - optionnal additionnal specifications\
@@ -69,7 +82,14 @@ checks that the value is an array satisfying optionnal specifications
 
 ### `isDict( value, options? )`
 
-checks that the value is a key/value pair dictionnary satisfying optionnal specifications
+Checks that the value is a key/value pair dictionnary satisfying optionnal specifications\
+**Remark:**\
+Only allows objects directly created from `{}` or `Object.create(Object.prototype)`.\
+Are considered invalid:
+- Objects built from classes like `const obj = new Foo()` or built-ins like `Array`, `Map`, `Set` or `Date`
+- Objects with no prototype like `const obj = Object.create(null)`
+
+#### ⚙️ Arguments:
 
 **value** - unknown value to check\
 **options** *(dict)* - optionnal additionnal specifications\
@@ -87,10 +107,10 @@ checks that the value is a key/value pair dictionnary satisfying optionnal speci
 
 ## Types
 
-### `Dict_T<T>`
+### `Dict_T<EntriesType>`
 
-type of key/value pair dictionnary, with a `string` key.
-`T` is the type of the entries of the dictionnary.
+Type of key/value pair dictionnary, with a `string` key.
+`EntriesType` generic represents the type of the entries of the dictionnary.
 
 #### Example
 
