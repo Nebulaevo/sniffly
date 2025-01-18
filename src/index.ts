@@ -1,4 +1,4 @@
-import type { Dict_T } from './utility-types'
+import type { Dict_T } from './utility-types.ts'
 
 type objWithLength_T = {
     length: number
